@@ -6,18 +6,17 @@ import numpy as np
 import pandas as pd
 import ntpath
 
-from directories import bg_dir, fg_dir, stimuli_dir, cropped_dir
-
+from directories import bg_dir, fg_dir, stimuli_dir
 
 
 def trim(im):
-    """Takes an image object and trims all the contiguous space around the edges."""
+    """Takes an image object and trims all the contiguous space around the
+    edges."""
     # https://stackoverflow.com/a/48605963/3433914
     bg = Image.new(im.mode, im.size, im.getpixel((0, 0)))
     diff = ImageChops.difference(im, bg)
     diff = ImageChops.add(diff, diff, 2.0, -100)
-    # Bounding box given as a 4-tuple defining the left, upper, right, and lower
-    # pixel coordinates.
+
     # If the image is completely empty, this method returns None.
     bbox = diff.getbbox()
     if bbox:
@@ -35,6 +34,7 @@ def pixel_ratio(im):
         if pixel[3] == 255:
             count += 1
     return count / len(pixels)
+
 
 def crop_backgrounds(bg_dir, cropped_dir):
     """Normalise the backgrounds so they have the same size by cropping and
@@ -88,6 +88,7 @@ def crop_backgrounds(bg_dir, cropped_dir):
                      '_cropped_both' + '.jpg')
     return (im_top.height, im_top.width)
 
+
 def paste_image_on_background(fg_im, bg_im):
     """Takes a foreground image, places it on top of a background image, and
     returns the combined image and the pixel ratio of foreground to
@@ -110,7 +111,8 @@ if __name__ == "__main__":
 
     # crop_backgrounds(bg_dir, cropped_dir)
 
-    df = pd.DataFrame(columns = ['Background', 'Foreground', 'Ratio', 'Filename'])
+    df = pd.DataFrame(
+        columns=['Background', 'Foreground', 'Ratio', 'Filename'])
 
     # Iterate through the face images and place them on the backgrounds.
     for fg_infile in glob.glob(fg_dir + "*.png"):
@@ -130,12 +132,12 @@ if __name__ == "__main__":
             except OSError:
                 pass
             save_filename = ntpath.basename(bg_file) + '_' + \
-                            ntpath.basename(fg_file) + '.jpg'
+                ntpath.basename(fg_file) + '.jpg'
 
-            df = df.append([{'Background' : bg_file,
-                        'Foreground' : fg_file,
-                        'Ratio' : ratio,
-                        'Filename': save_filename}])
+            df = df.append([{'Background': bg_file,
+                             'Foreground': fg_file,
+                             'Ratio': ratio,
+                             'Filename': save_filename}])
 
             save_path = save_dir + save_filename
             print('Saving:', save_path)
