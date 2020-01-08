@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import ntpath
 
-from directories import bg_dir, fg_dir, stimuli_dir
+from directories import bg_dir, fg_dir, stimuli_dir, cropped_dir
 
 
 def trim(im):
@@ -109,14 +109,14 @@ def paste_image_on_background(fg_im, bg_im):
 
 if __name__ == "__main__":
 
-    # crop_backgrounds(bg_dir, cropped_dir)
+    crop_backgrounds(bg_dir, cropped_dir)
 
     df = pd.DataFrame(
         columns=['Background', 'Foreground', 'Ratio', 'Filename'])
 
     # Iterate through the face images and place them on the backgrounds.
     for fg_infile in glob.glob(fg_dir + "*.png"):
-        for bg_infile in glob.glob(bg_dir + "*.jp*g"):
+        for bg_infile in glob.glob(cropped_dir + "*.jp*g"):
             bg_file, ext = os.path.splitext(bg_infile)
             bg_im = Image.open(bg_infile).convert('RGBA')
 
