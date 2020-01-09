@@ -36,7 +36,7 @@ def pixel_ratio(im):
     return count / len(pixels)
 
 
-def crop_backgrounds(bg_dir, cropped_dir):
+def crop_backgrounds(bg_dir, cropped_dir, cropped='both'):
     """Normalise the backgrounds so they have the same size by cropping and
     resizing."""
     widths = []
@@ -68,25 +68,31 @@ def crop_backgrounds(bg_dir, cropped_dir):
         except OSError:
             pass
 
-        # Cropping from the bottom
-        im_bottom = im.crop(
-            (0, 0, im.width, im.height - crop_pixels))
-        im_bottom.save(cropped_dir + ntpath.basename(file) +
-                       '_cropped_bottom' + '.jpg')
+        if cropped == 'bottom':
+            # Cropping from the bottom
+            im_bottom = im.crop(
+                (0, 0, im.width, im.height - crop_pixels))
+            im_bottom.save(cropped_dir + ntpath.basename(file) +
+                           '_cropped_bottom' + '.jpg')
+            return (im_bottom.height, im_bottom.width)
 
-        # Cropping from the top
-        im_top = im.crop((0,  crop_pixels, im.width, im.height))
-        im_top.save(cropped_dir + ntpath.basename(file) +
-                    '_cropped_top' + '.jpg')
 
-        # Cropping from both
-        im_both = im.crop((0, crop_pixels_both, im.width, im.height -
-                           crop_pixels_both))
-        # This is here to stop any rounding errors with resizing.
-        im_top = im_both.resize((im_top.width, im_top.height))
-        im_both.save(cropped_dir + ntpath.basename(file) +
-                     '_cropped_both' + '.jpg')
-    return (im_top.height, im_top.width)
+        if cropped == 'top':
+            # Cropping from the top
+            im_top = im.crop((0,  crop_pixels, im.width, im.height))
+            im_top.save(cropped_dir + ntpath.basename(file) +
+                        '_cropped_top' + '.jpg')
+            return (im_top.height, im_top.width)
+
+        if cropped == 'both':
+            # Cropping from both
+            im_both = im.crop((0, crop_pixels_both, im.width, im.height -
+                               crop_pixels_both))
+            # This is here to stop any rounding errors with resizing
+            im_both = im_both.resize((im_both.width, im_both.height))
+            im_both.save(cropped_dir + ntpath.basename(file) +
+                         '_cropped_both' + '.jpg')
+            return (im_both.height, im_both.width)
 
 
 def paste_image_on_background(fg_im, bg_im):
@@ -124,7 +130,7 @@ if __name__ == "__main__":
             fg_im = Image.open(fg_infile).convert('RGBA')
 
             stim_im, ratio = paste_image_on_background(fg_im, bg_im)
-            print('Pixel ratio of face to background = ', ratio)
+            # print('Pixel ratio of face to background = ', ratio)
             # Directory to savr the output stimuli.
             save_dir = stimuli_dir + ntpath.basename(bg_file) + '/'
             try:
