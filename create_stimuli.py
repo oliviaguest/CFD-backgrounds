@@ -7,7 +7,19 @@ import pandas as pd
 import ntpath
 import argparse
 from directories import bg_dir, fg_dir, stimuli_dir, cropped_dir
-from utils import get_pixel_ratio
+
+
+def get_pixel_ratio(im):
+    """Takes an image object and returns the ratio of the number of pixels that
+    have exactly 255 in the alpha channel and all the pixels."""
+    pixels = list(im.getdata())
+    count = 0
+    # Count the non-transparent pixels
+    for i, pixel in enumerate(pixels):
+        if pixel[3] == 255:
+            count += 1
+    return count / len(pixels)
+
 
 def trim(im):
     """Takes an image object and trims all the contiguous space around the
@@ -22,7 +34,6 @@ def trim(im):
     bbox = diff.getbbox()
     if bbox:
         return im.crop(bbox)
-
 
 
 def crop_backgrounds(bg_dir, cropped_dir):
@@ -63,7 +74,7 @@ def crop_backgrounds(bg_dir, cropped_dir):
         im_bottom.save(cropped_dir + ntpath.basename(file) +
                        '_cropped_bottom' + '.jpg')
 
-        # Cropping from the top
+        # Cropping from the top\texttt{create\_stimuli.py}
         im_top = im.crop((0,  crop_pixels, im.width, im.height))
         im_top.save(cropped_dir + ntpath.basename(file) +
                     '_cropped_top' + '.jpg')
