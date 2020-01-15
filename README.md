@@ -1,4 +1,8 @@
-# create-stimuli
+# CFD background stimuli generation
+
+This code takes input images from the [Chicago Face Database](https://chicagofaces.org/) (which must have had their backgrounds rendered transparent from the original white).
+It then combines them with some pre-set backgrounds to create stimuli that have a person in the foreground and a specific environemnt in the background in every possible combination.
+
 
 Please fill in the directories in `directories.py`.
 
